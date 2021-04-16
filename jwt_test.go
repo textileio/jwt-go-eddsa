@@ -18,6 +18,7 @@ var ed25519TestData = []struct {
 	alg         string
 	claims      map[string]interface{}
 	valid       bool
+	hash        bool
 }{
 	{
 		"EdDSA",
@@ -25,6 +26,7 @@ var ed25519TestData = []struct {
 		"EdDSA",
 		map[string]interface{}{"jti": "foo", "sub": "bar"},
 		true,
+		false,
 	},
 	{
 		"invalid key",
@@ -32,6 +34,15 @@ var ed25519TestData = []struct {
 		"EdDSA",
 		map[string]interface{}{"jti": "foo", "sub": "bar"},
 		false,
+		false,
+	},
+	{
+		"sha256 hash for signature",
+		"eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJmb28iLCJzdWIiOiJiYXIifQ.x1tRfmjfL70P7jxXHTfW47D9sjwbl0BGJECjIfocntlQi-ACVF8OuaW829f-5ag6HBt_E76Eh8IkLXeBK-gsBA",
+		"EdDSASha256",
+		map[string]interface{}{"jti": "foo", "sub": "bar"},
+		true,
+		true,
 	},
 }
 
@@ -49,6 +60,7 @@ func TestSigningMethodEd25519_Sign(t *testing.T) {
 	for _, data := range ed25519TestData {
 		if data.valid {
 			parts := strings.Split(data.tokenString, ".")
+
 			method := jwt.GetSigningMethod(data.alg)
 			sig, err := method.Sign(strings.Join(parts[0:2], "."), sk)
 			if err != nil {
@@ -90,6 +102,11 @@ func TestGenerateEd25519Token(t *testing.T) {
 		Subject: "bar",
 	}
 	_, err = jwt.NewWithClaims(eddsa.SigningMethodEd25519i, claims).SignedString(sk)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	_, err = jwt.NewWithClaims(eddsa.SigningMethodEd25519Sha256, claims).SignedString(sk)
 	if err != nil {
 		t.Fatal(err)
 	}

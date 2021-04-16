@@ -20,14 +20,19 @@ type SigningMethodEd25519 struct {
 // SigningMethodEd25519i is a specific instance for Ed25519.
 var SigningMethodEd25519i *SigningMethodEd25519
 
-// SigningMethodEd25519Sha is a specific instance for Ed25519 with hashing enabled
-var SigningMethodEd25519Sha *SigningMethodEd25519
+// SigningMethodEd25519Sha is a non-standard, specific instance for Ed25519
+// with sha256 hashing enabled.
+var SigningMethodEd25519Sha256 *SigningMethodEd25519
 
 func init() {
 	SigningMethodEd25519i = &SigningMethodEd25519{"EdDSA", false}
-	SigningMethodEd25519Sha = &SigningMethodEd25519{"EdDSA", true}
 	jwt.RegisterSigningMethod(SigningMethodEd25519i.Alg(), func() jwt.SigningMethod {
 		return SigningMethodEd25519i
+	})
+	// Register non-standard method
+	SigningMethodEd25519Sha256 = &SigningMethodEd25519{"EdDSASha256", true}
+	jwt.RegisterSigningMethod(SigningMethodEd25519Sha256.Alg(), func() jwt.SigningMethod {
+		return SigningMethodEd25519Sha256
 	})
 }
 

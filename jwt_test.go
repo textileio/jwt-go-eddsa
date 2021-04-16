@@ -39,7 +39,7 @@ var ed25519TestData = []struct {
 	{
 		"sha256 hash for signature",
 		"eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJmb28iLCJzdWIiOiJiYXIifQ.x1tRfmjfL70P7jxXHTfW47D9sjwbl0BGJECjIfocntlQi-ACVF8OuaW829f-5ag6HBt_E76Eh8IkLXeBK-gsBA",
-		"EdDSA",
+		"EdDSASha256",
 		map[string]interface{}{"jti": "foo", "sub": "bar"},
 		true,
 		true,
@@ -60,12 +60,8 @@ func TestSigningMethodEd25519_Sign(t *testing.T) {
 	for _, data := range ed25519TestData {
 		if data.valid {
 			parts := strings.Split(data.tokenString, ".")
-			var method jwt.SigningMethod
-			if data.hash {
-				method = eddsa.SigningMethodEd25519Sha
-			} else {
-				method = jwt.GetSigningMethod(data.alg)
-			}
+
+			method := jwt.GetSigningMethod(data.alg)
 			sig, err := method.Sign(strings.Join(parts[0:2], "."), sk)
 			if err != nil {
 				t.Errorf("[%v] error signing token: %v", data.name, err)
@@ -85,12 +81,7 @@ func TestSigningMethodEd25519_Verify(t *testing.T) {
 	for _, data := range ed25519TestData {
 		parts := strings.Split(data.tokenString, ".")
 
-		var method jwt.SigningMethod
-		if data.hash {
-			method = eddsa.SigningMethodEd25519Sha
-		} else {
-			method = jwt.GetSigningMethod(data.alg)
-		}
+		method := jwt.GetSigningMethod(data.alg)
 		err := method.Verify(strings.Join(parts[0:2], "."), parts[2], pk)
 		if data.valid && err != nil {
 			t.Errorf("[%v] error while verifying key: %v", data.name, err)
@@ -115,7 +106,7 @@ func TestGenerateEd25519Token(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	_, err = jwt.NewWithClaims(eddsa.SigningMethodEd25519Sha, claims).SignedString(sk)
+	_, err = jwt.NewWithClaims(eddsa.SigningMethodEd25519Sha256, claims).SignedString(sk)
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -3,7 +3,7 @@ package eddsa
 import (
 	"crypto/sha256"
 
-	"github.com/dgrijalva/jwt-go"
+	"github.com/golang-jwt/jwt"
 	"github.com/libp2p/go-libp2p-core/crypto"
 )
 

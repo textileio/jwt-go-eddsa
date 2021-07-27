@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/dgrijalva/jwt-go"
+	"github.com/golang-jwt/jwt"
 	"github.com/libp2p/go-libp2p-core/crypto"
 	eddsa "github.com/textileio/jwt-go-eddsa"
 )
